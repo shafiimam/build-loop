@@ -67,12 +67,13 @@ All live in the `build-loop/` source repo.
 
 `detect-state.sh` checks, in order:
 
-1. `.planning/` directory present → `gsd-ready`.
-2. `.planning/` absent **and** any of (`PLAN.md`, `.claude/prompts/`,
+1. `.planning/` present **and** holds both `ROADMAP.md` and `STATE.md` →
+   `gsd-ready` (wins even if `PLAN.md` also present — already ingested, resume).
+2. `.planning/` present **but** missing `ROADMAP.md` or `STATE.md` →
+   `ambiguous` (partial / broken setup — do not guess).
+3. `.planning/` absent **and** any of (`PLAN.md`, `.claude/prompts/`,
    `context/`) present → `has-plan-docs`.
-3. None of the above, directory effectively empty of plan artifacts →
-   `greenfield`.
-4. Conflicting signals that cannot be classified → `ambiguous`.
+4. None of the above (no plan artifacts) → `greenfield`.
 
 ## Brownfield Mapping
 
@@ -93,7 +94,8 @@ Nothing is overwritten silently.
 ## Testing
 
 - `detect-state.sh` is the only real logic → `bats` tests over fixture dirs:
-  empty, PLAN-only, `.planning`-present, both-present (ambiguous).
+  empty (`greenfield`), PLAN-only (`has-plan-docs`), full `.planning/` with
+  ROADMAP+STATE (`gsd-ready`), partial `.planning/` missing STATE (`ambiguous`).
 - Router + loop = reuse of tested plugins; no new test burden there.
 
 ## YAGNI / Out of Scope

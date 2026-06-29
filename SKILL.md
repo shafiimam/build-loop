@@ -1,6 +1,6 @@
 ---
 name: build-loop
-description: "Autonomous build loop for any project — detects state (new / has-PLAN / gsd-ready) and routes through gstack brainstorm, gsd ingest/new-project, and gsd-autonomous with superpowers TDD. Use when the user wants to run, start, or continue the autonomous build loop on a project."
+description: "Autonomous build loop for any project — detects state (greenfield / has-plan-docs / gsd-ready / ambiguous) and routes through gstack brainstorm, gsd ingest/new-project, and gsd-autonomous with superpowers TDD. Use when the user wants to run, start, or continue the autonomous build loop on a project."
 allowed-tools:
   - Bash
   - Read

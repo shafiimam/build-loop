@@ -27,9 +27,9 @@ subagent per phase (context-rot defense). TDD is enforced inside phases by
 
 build-loop only routes — it depends on these being installed in Claude Code:
 
-- **superpowers** — TDD backbone inside each phase
-- **GSD** (`gsd-*` skills, incl. `gsd-autonomous`, `gsd-new-project`, `gsd-ingest-docs`) — phase decomposition + the loop engine
-- **gstack** (incl. `office-hours`) — role brainstorm + blocker votes
+- **[superpowers](https://github.com/obra/superpowers)** — TDD backbone inside each phase
+- **[GSD](https://github.com/open-gsd/gsd-core)** (`gsd-*` skills, incl. `gsd-autonomous`, `gsd-new-project`, `gsd-ingest-docs`) — phase decomposition + the loop engine
+- **[gstack](https://github.com/garrytan/gstack)** (incl. `office-hours`) — role brainstorm + blocker votes
 
 If those aren't installed, the detector still runs but the routed steps won't
 resolve. Install them first.

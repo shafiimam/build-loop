@@ -1,6 +1,13 @@
 # Build Loop — Runbook
 
-Autonomous build loop over your installed plugins. One command, new or ongoing.
+A hybrid orchestrator over your installed tools. One command, new or ongoing.
+
+```
+gbrain       MEMORY   remembers decisions + code across sessions
+gstack       BRAINS   front: plan/design   back: review/QA/ship
+GSD          ENGINE   decompose into phases + autonomous build
+superpowers  METHOD   TDD inside every phase
+```
 
 ## Install (once)
 
@@ -10,18 +17,26 @@ Symlinks this repo to `~/.claude/skills/build-loop`. Re-run safely any time.
 
 ## Use
 
-In any project, invoke the **build-loop** skill. It detects state and routes:
+In any project, invoke the **build-loop** skill. It runs:
 
-| State          | What it does                                                        |
-|----------------|--------------------------------------------------------------------|
-| greenfield     | gstack role-brainstorm → `gsd-new-project` → confirm → loop         |
-| has-plan-docs  | `gsd-ingest-docs --mode new` → resolve conflicts → loop             |
-| gsd-ready      | runs `gsd-autonomous` straight (resumes from STATE.md)              |
-| ambiguous      | stops and asks (partial `.planning/`)                               |
+0. **Memory** — uses gbrain if connected; offers `setup-gbrain` if not (optional).
+1. **Detect state** — greenfield / has-plan-docs / gsd-ready / ambiguous.
+2. **Plan + design (gstack, front)** — route by state:
 
-The loop = `gsd-autonomous`: discuss → plan → execute per phase, a fresh
-subagent per phase (context-rot defense). TDD enforced by superpowers. Gray-area
-blockers trigger a gstack vote.
+   | State          | What it does                                                          |
+   |----------------|----------------------------------------------------------------------|
+   | greenfield     | `office-hours` → (UI: `design-shotgun`→`plan-design-review`) → `plan-eng-review` → `autoplan` → `gsd-import` |
+   | has-plan-docs  | `gsd-ingest-docs --mode new` → resolve conflicts                      |
+   | gsd-ready      | skip straight to build (resumes from STATE.md)                        |
+   | ambiguous      | stops and asks (partial `.planning/`)                                 |
+
+3. **Build (GSD + superpowers)** — `gsd-autonomous`: discuss → plan → execute per
+   phase, fresh subagent per phase (context-rot defense). TDD inside each phase
+   via superpowers. Gray-area blocker → gstack vote (`plan-design-review` for UI,
+   else `office-hours`) → resume.
+4. **Review + test + ship (gstack, back)** — `review` → `qa` (real browser) →
+   `ship` / `land-and-deploy`.
+5. **Reflect** — optional `retro`; persists to gbrain if connected.
 
 ## Brownfield (existing PLAN.md)
 

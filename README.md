@@ -1,38 +1,53 @@
 # build-loop
 
 An autonomous **build loop** for [Claude Code](https://claude.com/claude-code) —
-one skill that detects a project's state and drives it through brainstorm →
-decompose → autonomous TDD build, by glueing together skills you already have.
+one skill that takes a project from idea to shipped by orchestrating four tools
+you already have, each at its own altitude:
+
+```
+gbrain       MEMORY   remembers decisions + code across sessions
+gstack       BRAINS   front: plan/design   back: review/QA/ship
+GSD          ENGINE   decompose into phases + autonomous build
+superpowers  METHOD   TDD inside every phase
+```
 
 It is a thin **router**, not an engine. It inspects the project, picks the right
-entry point, and hands off to existing plugins. Works on **new** and **ongoing**
-projects.
+entry point, and hands the work between these tools. Works on **new** and
+**ongoing** projects.
 
 ## How it works
 
-Invoke the skill. It runs a state detector and routes:
+Invoke the skill. It runs a hybrid loop:
 
-| Your project has…                              | Detected        | What build-loop does                                              |
-|------------------------------------------------|-----------------|-------------------------------------------------------------------|
-| nothing (empty dir)                            | `greenfield`    | role-brainstorm → `gsd-new-project` → confirm → autonomous loop    |
-| `PLAN.md` / `.claude/prompts/` / `context/`    | `has-plan-docs` | `gsd-ingest-docs --mode new` → review conflicts → autonomous loop  |
-| `.planning/` with `ROADMAP.md` + `STATE.md`    | `gsd-ready`     | runs the loop straight (resumes from `STATE.md`)                   |
-| partial / broken `.planning/`                  | `ambiguous`     | stops and asks you                                                 |
+0. **Memory** — uses gbrain if connected (semantic code search + recall of past
+   decisions); offers `setup-gbrain` if not. Optional.
+1. **Detect state** — then route through the front:
 
-The **loop** = `gsd-autonomous`: discuss → plan → execute per phase, a fresh
-subagent per phase (context-rot defense). TDD is enforced inside phases by
-**superpowers**. Gray-area blockers trigger a role vote, then resume.
+   | Your project has…                            | Detected        | Plan + design (gstack, front)                                     |
+   |----------------------------------------------|-----------------|-------------------------------------------------------------------|
+   | nothing (empty dir)                          | `greenfield`    | `office-hours` → (UI: `design-shotgun`→`plan-design-review`) → `plan-eng-review` → `autoplan` → `gsd-import` |
+   | `PLAN.md` / `.claude/prompts/` / `context/`  | `has-plan-docs` | `gsd-ingest-docs --mode new` → review conflicts                   |
+   | `.planning/` with `ROADMAP.md` + `STATE.md`  | `gsd-ready`     | skip straight to build (resumes from `STATE.md`)                  |
+   | partial / broken `.planning/`                | `ambiguous`     | stops and asks you                                                |
+
+2. **Build** — `gsd-autonomous`: discuss → plan → execute per phase, a fresh
+   subagent per phase (context-rot defense). TDD enforced inside each phase by
+   **superpowers**. Gray-area blocker → gstack vote, then resume.
+3. **Review + test + ship** (gstack, back) — `review` → `qa` (real browser) →
+   `ship` / `land-and-deploy`. Optional `retro` persists learnings to gbrain.
 
 ## Prerequisites
 
 build-loop only routes — it depends on these being installed in Claude Code:
 
 - **[superpowers](https://github.com/obra/superpowers)** — TDD backbone inside each phase
-- **[GSD](https://github.com/open-gsd/gsd-core)** (`gsd-*` skills, incl. `gsd-autonomous`, `gsd-new-project`, `gsd-ingest-docs`) — phase decomposition + the loop engine
-- **[gstack](https://github.com/garrytan/gstack)** (incl. `office-hours`) — role brainstorm + blocker votes
+- **[GSD](https://github.com/open-gsd/gsd-core)** (`gsd-*` skills, incl. `gsd-autonomous`, `gsd-import`, `gsd-ingest-docs`, `gsd-new-project`) — phase decomposition + the loop engine
+- **[gstack](https://github.com/garrytan/gstack)** (incl. `office-hours`, `plan-design-review`, `plan-eng-review`, `autoplan`, `review`, `qa`, `ship`) — planning, design, review, QA, ship
+- **[gbrain](https://github.com/garrytan/gbrain)** (via gstack's `setup-gbrain`) — *optional* persistent memory: semantic code search + cross-session recall
 
-If those aren't installed, the detector still runs but the routed steps won't
-resolve. Install them first.
+The first three are required; gbrain is optional. If the required ones aren't
+installed, the detector still runs but the routed steps won't resolve — install
+them first.
 
 ## Install
 

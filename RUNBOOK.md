@@ -38,6 +38,12 @@ In any project, invoke the **build-loop** skill. It runs:
    `ship` / `land-and-deploy`.
 5. **Reflect** — optional `retro`; persists to gbrain if connected.
 
+## Browser policy
+
+All browser work — launch, navigate, screenshot, DevTools, QA — goes through
+gstack's `browse` skill (and `qa`). Never the default Chrome integration or
+`mcp__claude-in-chrome__*` / `chrome-devtools` tools.
+
 ## Brownfield (existing PLAN.md)
 
 Detector returns `has-plan-docs`. Ingest merges `PLAN.md` + `.claude/prompts/` +

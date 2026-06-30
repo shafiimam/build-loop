@@ -101,6 +101,11 @@ decisions, plan, and retro persist there — so the next session remembers this 
 
 ## Guardrails
 
+- **Browser = gstack only.** For ANY browser task — launching a browser,
+  opening a URL, navigating, taking screenshots, DevTools/inspection, or QA —
+  use gstack's `browse` skill (and `qa`/`qa-only` for testing flows). Never use
+  the default Chrome integration or `mcp__claude-in-chrome__*` /
+  `chrome-devtools` tools. This applies in every step, including Step 4's `qa`.
 - Token-heavy. Recommend Claude Max or API usage for long runs.
 - One source of truth: once a plan is imported into GSD, edit it in `.planning/`,
   not the original gstack doc. Re-import on big changes.

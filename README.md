@@ -78,6 +78,8 @@ bash scripts/detect-state.sh /path/to/project
 - Resume any time: re-invoke build-loop; it lands on `gsd-ready` and continues
   from `STATE.md`.
 - Nothing is overwritten silently — brownfield ingest gates on a conflict review.
+- All browser work (testing, screenshots, DevTools) routes through gstack's
+  `browse` skill — not the default Chrome integration.
 
 Full how-to: [RUNBOOK.md](RUNBOOK.md). Design + plan: [`docs/superpowers/`](docs/superpowers/).
 

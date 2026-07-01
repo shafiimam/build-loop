@@ -73,8 +73,15 @@ Route on the detected state. This is where human judgment lives — gstack owns 
 
 ## Step 3 — BUILD (GSD engine + superpowers method)
 
-Invoke `gsd-autonomous` to run all remaining phases (discuss → plan → execute,
-a fresh subagent per phase = context-rot defense).
+Invoke `gsd-autonomous` to run all remaining phases (discuss → plan → execute).
+
+**Context isolation, honestly:** on the **Codex** runtime each phase is
+backgrounded as a nested subagent (true per-phase isolation). On **Claude Code**,
+`gsd-autonomous` runs plan/execute **inline** — the orchestrator's context
+accumulates across phases. Real isolation there comes from **per-wave worktree
+executors** (each runs in its own worktree + fresh context and is discarded), and
+the reset mechanism is **checkpoint + resume in a fresh session** (see the
+"Managing context" guardrail). Do not promise per-phase isolation on Claude Code.
 
 Inside each phase, superpowers is the backbone — the builder works through:
 `writing-plans` (phase → tasks) → `subagent-driven-development` (fresh subagent
@@ -107,6 +114,14 @@ decisions, plan, and retro persist there — so the next session remembers this 
   the default Chrome integration or `mcp__claude-in-chrome__*` /
   `chrome-devtools` tools. This applies in every step, including Step 4's `qa`.
 - Token-heavy. Recommend Claude Max or API usage for long runs.
+- **Managing context (Claude Code).** The orchestrator accumulates context across
+  phases (see Step 3). GSD's `context_guard` self-checks before each wave: at
+  50–70% it degrades to frontmatter-only reads; at 70%+ it advises pausing. Set
+  `workflow.context_guard_mode: "auto"` in `.planning/config.json` to auto-pause
+  at 70% instead of only warning. To reset context: `gsd-pause-work` to
+  checkpoint, then **start a fresh session** and re-invoke this skill — it lands
+  on `gsd-ready` and resumes from `STATE.md` with a clean window. Keep
+  phases/waves small so less accumulates between resets.
 - One source of truth: once a plan is imported into GSD, edit it in `.planning/`,
   not the original gstack doc. Re-import on big changes.
 - Don't double-plan: gstack does the high-level plan once; GSD does the

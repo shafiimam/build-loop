@@ -30,9 +30,12 @@ Invoke the skill. It runs a hybrid loop:
    | `.planning/` with `ROADMAP.md` + `STATE.md`  | `gsd-ready`     | skip straight to build (resumes from `STATE.md`)                  |
    | partial / broken `.planning/`                | `ambiguous`     | stops and asks you                                                |
 
-2. **Build** — `gsd-autonomous`: discuss → plan → execute per phase, a fresh
-   subagent per phase (context-rot defense). TDD enforced inside each phase by
-   **superpowers**. Gray-area blocker → gstack vote, then resume.
+2. **Build** — `gsd-autonomous`: discuss → plan → execute per phase. Isolation
+   comes from per-wave worktree executors (fresh context each); on Codex whole
+   phases are backgrounded as subagents, on Claude Code the orchestrator runs
+   inline (reset via checkpoint + fresh session — see Managing context below).
+   TDD enforced inside each phase by **superpowers**. Gray-area blocker → gstack
+   vote, then resume.
 3. **Review + test + ship** (gstack, back) — `review` → `qa` (real browser) →
    `ship` / `land-and-deploy`. Optional `retro` persists learnings to gbrain.
 
@@ -80,6 +83,17 @@ bash scripts/detect-state.sh /path/to/project
 - Nothing is overwritten silently — brownfield ingest gates on a conflict review.
 - All browser work (testing, screenshots, DevTools) routes through gstack's
   `browse` skill — not the default Chrome integration.
+
+## Managing context (Claude Code)
+
+On Claude Code the autonomous orchestrator runs inline, so its context grows
+across phases — expect the meter to climb; that's normal, not rot. GSD's
+`context_guard` self-checks before each wave (degrades reads at 50–70%, advises
+pausing at 70%+). Set `workflow.context_guard_mode: "auto"` in
+`.planning/config.json` to auto-pause instead of only warning. To reset: run
+`gsd-pause-work`, then start a **fresh session** and re-invoke build-loop — it
+resumes from `STATE.md` with a clean window. True per-phase subagent isolation
+requires the Codex runtime.
 
 Full how-to: [RUNBOOK.md](RUNBOOK.md). Design + plan: [`docs/superpowers/`](docs/superpowers/).
 

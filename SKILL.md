@@ -113,6 +113,19 @@ decisions, plan, and retro persist there — so the next session remembers this 
   use gstack's `browse` skill (and `qa`/`qa-only` for testing flows). Never use
   the default Chrome integration or `mcp__claude-in-chrome__*` /
   `chrome-devtools` tools. This applies in every step, including Step 4's `qa`.
+- **Model-independent.** This skill pins no model — it runs on the session's
+  selected model (Opus, Sonnet, Fable, Haiku, all equal). Any subagent dispatch
+  must inherit the session model; never pass a model override.
+- **If the loop won't start after a model switch — it's permissions, not the
+  model.** In auto approval mode the harness approves each Bash call with a
+  separate classifier model; if that model is unavailable, Step 1's
+  `detect-state.sh` and GSD's `gsd-tools` calls stall before any real work. This
+  is a harness limitation, not a pin in this skill. Fix: allowlist the loop's
+  commands in `.claude/settings.json` `permissions.allow` so Bash runs without
+  the classifier — e.g.
+  `Bash(bash ~/.claude/skills/build-loop/scripts/detect-state.sh:*)`,
+  `Bash(node:*gsd-core/bin/gsd-tools.cjs:*)`, `Bash(git:*)` — or switch that
+  session to a non-auto permission mode.
 - Token-heavy. Recommend Claude Max or API usage for long runs.
 - **Managing context (Claude Code).** The orchestrator accumulates context across
   phases (see Step 3). GSD's `context_guard` self-checks before each wave: at
